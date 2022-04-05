@@ -1,24 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
 import './App.css';
+import CoinTable from './components/CoinTable';
+import type { Coin } from './type';
 
-function App() {
+const App: React.FunctionComponent = () => {
+  const [responseData, setData] = useState<Array<Coin> | undefined>(undefined);
+
+  const fetchData = async () => {
+    const result = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=5&page=1&sparkline=false');
+    const data: Array<Coin> = await result.json();
+
+    setData(data);
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  console.log(responseData);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Crypto Prices</h1>
+      { responseData ? (
+        <CoinTable coins={responseData} />
+      ) : (
+        "Loading..."
+      )}
     </div>
   );
 }
